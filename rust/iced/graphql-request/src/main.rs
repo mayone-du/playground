@@ -1,7 +1,12 @@
-use iced::{button, executor, Application, Button, Column, Command, Element, Settings, Text};
+use iced::{
+    button, executor, Application, Button, Clipboard, Column, Command, Element, Settings, Text,
+};
+use iced_winit::{event, winit, winit::event_loop::EventLoop};
 use reqwest;
 
 pub fn main() -> iced::Result {
+    let event_loop = EventLoop::new();
+    let window = winit::window::Window::new(&event_loop).unwrap();
     State::run(Settings::default())
 }
 
@@ -29,7 +34,7 @@ impl Application for State {
         String::from("GraphQL Request - Iced")
     }
 
-    fn update(&mut self, message: Message) -> Command<Message> {
+    fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
         match message {
             Message::RequestPressed => {
                 let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
