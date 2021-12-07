@@ -5,8 +5,8 @@ use iced_winit::{event, winit, winit::event_loop::EventLoop};
 use reqwest;
 
 pub fn main() -> iced::Result {
-    let event_loop = EventLoop::new();
-    let window = winit::window::Window::new(&event_loop).unwrap();
+    // let event_loop = EventLoop::new();
+    // let window = winit::window::Window::new(&event_loop).unwrap();
     State::run(Settings::default())
 }
 
@@ -34,17 +34,25 @@ impl Application for State {
         String::from("GraphQL Request - Iced")
     }
 
-    fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
+    async fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
         match message {
             Message::RequestPressed => {
-                let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
-                let result = match result {
-                    Ok(response) => response.text().unwrap(),
+                // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
+                let result = reqwest::get("https://jsonplaceholder.typicode.com/posts/").await;
+                match result {
+                    Ok(response) => response.text().await,
                     Err(e) => {
                         panic!("{:?}", e);
                     }
                 };
-                self.value = result.to_string();
+                match result {
+                    Ok(response) => {
+                        self.value = response.text().await.unwrap();
+                    }
+                    Err(e) => {
+                        panic!("{:?}", e);
+                    }
+                }
             }
         }
         Command::none()
@@ -53,7 +61,7 @@ impl Application for State {
     fn view(&mut self) -> Element<Message> {
         Column::new()
             .padding(20)
-            .push(Text::new(self.value.to_string()).size(50))
+            .push(Text::new(self.value.to_string()).size(10))
             .push(
                 Button::new(&mut self.request_button, Text::new("Request"))
                     .on_press(Message::RequestPressed),
