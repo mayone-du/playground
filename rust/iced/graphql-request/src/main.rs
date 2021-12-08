@@ -34,25 +34,17 @@ impl Application for State {
         String::from("GraphQL Request - Iced")
     }
 
-    async fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
+    fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
         match message {
             Message::RequestPressed => {
-                // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
-                let result = reqwest::get("https://jsonplaceholder.typicode.com/posts/").await;
-                match result {
-                    Ok(response) => response.text().await,
+                let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
+                let result = match result {
+                    Ok(response) => response.text(),
                     Err(e) => {
                         panic!("{:?}", e);
                     }
                 };
-                match result {
-                    Ok(response) => {
-                        self.value = response.text().await.unwrap();
-                    }
-                    Err(e) => {
-                        panic!("{:?}", e);
-                    }
-                }
+                self.value = result.unwrap().to_string();
             }
         }
         Command::none()
