@@ -1,5 +1,6 @@
 use iced::{
-    button, executor, Application, Button, Clipboard, Column, Command, Element, Settings, Text,
+    button, executor, scrollable, Application, Button, Clipboard, Column, Command, Element,
+    Scrollable, Settings, Text,
 };
 use iced_winit::{event, winit, winit::event_loop::EventLoop};
 use reqwest;
@@ -10,8 +11,9 @@ pub fn main() -> iced::Result {
     State::run(Settings::default())
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct State {
+    scroll: scrollable::State,
     value: String,
     request_button: button::State,
 }
@@ -51,13 +53,16 @@ impl Application for State {
     }
 
     fn view(&mut self) -> Element<Message> {
-        Column::new()
+        let text = Text::new(&self.value).size(10);
+        let request_button = Button::new(&mut self.request_button, Text::new("Request"))
+            .on_press(Message::RequestPressed);
+        let content = Column::new()
             .padding(20)
-            .push(Text::new(self.value.to_string()).size(10))
-            .push(
-                Button::new(&mut self.request_button, Text::new("Request"))
-                    .on_press(Message::RequestPressed),
-            )
-            .into()
+            .spacing(20)
+            .max_width(500)
+            .push(text)
+            .push(request_button);
+
+        Scrollable::new(&mut self.scroll).push(content).into()
     }
 }
