@@ -1189,6 +1189,7 @@ dependencies = [
  "iced",
  "iced_winit",
  "reqwest",
+ "tokio",
 ]
 
 [[package]]
