@@ -1,3 +1,4 @@
+use graphql_client::{GraphQLQuery, Response};
 use iced::{
     button, executor, scrollable, Application, Button, Clipboard, Column, Command, Element,
     Scrollable, Settings, Text,
@@ -54,9 +55,6 @@ impl Application for State {
                             .to_string();
                         text
                     },
-                    // |a| {
-                    //     self.value = a;
-                    // },
                     |data| {
                         println!("{:?}", data);
                     },
@@ -64,7 +62,8 @@ impl Application for State {
                 // .futures();
                 // Command::batch(com);
 
-                let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
+                // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
+                let result = reqwest::blocking::get("http://localhost:8000/graphql");
                 let result = match result {
                     Ok(response) => response.text(),
                     Err(e) => {
