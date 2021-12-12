@@ -40,14 +40,9 @@ impl Application for State {
     fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
         match message {
             Message::RequestPressed => {
-                fn hoge(a: String) -> String {
-                    println!("{}", a);
-                    a
-                }
-                Command::perform(
+                let com = Command::perform(
                     async {
                         let client = reqwest::Client::new();
-                        println!("hogeeeeeeeeee");
                         let text = client
                             .get("https://jsonplaceholder.typicode.com/todos/1")
                             .send()
@@ -58,25 +53,16 @@ impl Application for State {
                             .unwrap()
                             .to_string();
                         text
-                        // self.value = text;
-                        // let response = client
-                        //     .post("https://graphql-pokemon.now.sh/")
-                        //     .json(&json!({
-                        //         "query": "query { pokemon(name: \"Pikachu\") { name } }"
-                        //     }))
-                        //     .send()
-                        //     .await
-                        //     .unwrap();
-                        // let body = response.text().await.unwrap();
-                        // println!("{}", body);
-                        // return body;
-                        // "hoge".to_string()
                     },
                     // |a| {
                     //     self.value = a;
                     // },
-                    hoge,
+                    |data| {
+                        println!("{:?}", data);
+                    },
                 );
+                // .futures();
+                // Command::batch(com);
 
                 let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
                 let result = match result {
