@@ -4,6 +4,7 @@ use iced::{
 };
 use iced_winit::{event, winit, winit::event_loop::EventLoop};
 use reqwest;
+use tokio;
 
 pub fn main() -> iced::Result {
     // let event_loop = EventLoop::new();
@@ -39,6 +40,44 @@ impl Application for State {
     fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
         match message {
             Message::RequestPressed => {
+                fn hoge(a: String) -> String {
+                    println!("{}", a);
+                    a
+                }
+                Command::perform(
+                    async {
+                        let client = reqwest::Client::new();
+                        println!("hogeeeeeeeeee");
+                        let text = client
+                            .get("https://jsonplaceholder.typicode.com/todos/1")
+                            .send()
+                            .await
+                            .unwrap()
+                            .text()
+                            .await
+                            .unwrap()
+                            .to_string();
+                        text
+                        // self.value = text;
+                        // let response = client
+                        //     .post("https://graphql-pokemon.now.sh/")
+                        //     .json(&json!({
+                        //         "query": "query { pokemon(name: \"Pikachu\") { name } }"
+                        //     }))
+                        //     .send()
+                        //     .await
+                        //     .unwrap();
+                        // let body = response.text().await.unwrap();
+                        // println!("{}", body);
+                        // return body;
+                        // "hoge".to_string()
+                    },
+                    // |a| {
+                    //     self.value = a;
+                    // },
+                    hoge,
+                );
+
                 let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
                 let result = match result {
                     Ok(response) => response.text(),
