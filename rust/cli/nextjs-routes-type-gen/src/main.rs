@@ -1,11 +1,13 @@
 use std::{fs, io};
 
 fn main() -> io::Result<()> {
-    let mut entries = fs::read_dir("./example/src/pages")?
+    let entries = fs::read_dir("./example/src/pages")?
         .map(|res| res.map(|e| e.path()))
-        .collect::<Result<Vec<_>, io::Error>>()?;
+        .collect::<Result<Vec<_>, io::Error>>()?
+        .sort();
 
-    entries.sort();
+    // fs::write("type.ts", "hogehoge")?;
+
     println!("{:#?}", entries);
 
     // The entries have now been sorted by their path.
