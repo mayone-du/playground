@@ -64,24 +64,32 @@ impl Sandbox for State {
     }
 
     fn view(&mut self) -> Element<Message> {
+        // add
+        let add_button = Button::new(
+            &mut self.add_operation_button,
+            Text::new("add").color(Color::from_rgb(100.0, 100.0, 0.0)),
+        )
+        .on_press(Message::ButtonPressed(Operation::Add));
+        // subtract
+        let subtract_button = Button::new(
+            &mut self.subtract_operation_button,
+            Text::new("subtract").color(Color::from_rgb(100.0, 100.0, 0.0)),
+        )
+        .on_press(Message::ButtonPressed(Operation::Subtract));
+
+        let multiply_button = Button::new(
+            &mut self.multiply_operation_button,
+            Text::new("multiply").color(Color::from_rgb(100.0, 100.0, 0.0)),
+        )
+        .on_press(Message::ButtonPressed(Operation::Multiply));
+
         // カラム
         Column::new()
             .padding(20)
             // ボタンを生成し、クリックイベントにMessageのIncrementPressedを指定
-            .push(
-                Button::new(
-                    &mut self.add_operation_button,
-                    Text::new("add").color(Color::from_rgb(100.0, 100.0, 0.0)),
-                )
-                .on_press(Message::ButtonPressed(Operation::Add)),
-            )
-            .push(
-                Button::new(
-                    &mut self.subtract_operation_button,
-                    Text::new("subtract").color(Color::from_rgb(100.0, 100.0, 0.0)),
-                )
-                .on_press(Message::ButtonPressed(Operation::Subtract)),
-            )
+            .push(add_button)
+            .push(subtract_button)
+            .push(multiply_button)
             .into()
     }
 }
