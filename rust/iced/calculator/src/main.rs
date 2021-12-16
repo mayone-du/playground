@@ -9,9 +9,15 @@ pub fn main() -> iced::Result {
 // アプリケーションのstate
 #[derive(Debug, Default)]
 struct State {
-    value: i32,
-    current_input: text_input::State,
-    operation_button: button::State,
+    previous_value: i32,
+    current_value: i32,
+    calclated_value: i32,
+    add_operation_button: button::State,
+    subtract_operation_button: button::State,
+    multiply_operation_button: button::State,
+    divide_operation_button: button::State,
+    reset_operation_button: button::State,
+    calculate_operation_button: button::State,
 }
 
 // 操作
@@ -22,6 +28,7 @@ enum Operation {
     Multiply,
     Divide,
     Reset,
+    Calculate,
 }
 
 // メッセージ
@@ -61,10 +68,20 @@ impl Sandbox for State {
         Column::new()
             .padding(20)
             // ボタンを生成し、クリックイベントにMessageのIncrementPressedを指定
-            .push(Button::new(
-                &mut self.operation_button,
-                Text::new("add").color(Color::from_rgb(100.0, 100.0, 0.0)),
-            ))
+            .push(
+                Button::new(
+                    &mut self.add_operation_button,
+                    Text::new("add").color(Color::from_rgb(100.0, 100.0, 0.0)),
+                )
+                .on_press(Message::ButtonPressed(Operation::Add)),
+            )
+            .push(
+                Button::new(
+                    &mut self.subtract_operation_button,
+                    Text::new("subtract").color(Color::from_rgb(100.0, 100.0, 0.0)),
+                )
+                .on_press(Message::ButtonPressed(Operation::Subtract)),
+            )
             .into()
     }
 }
