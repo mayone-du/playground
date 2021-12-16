@@ -62,8 +62,9 @@ impl Application for State {
                 // .futures();
                 // Command::batch(com);
 
+                let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
                 // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
-                let result = reqwest::blocking::get("http://localhost:8000/graphql");
+                // let result = reqwest::blocking::get("http://localhost:8000/graphql");
                 let result = match result {
                     Ok(response) => response.text(),
                     Err(e) => {
