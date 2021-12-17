@@ -18,6 +18,7 @@ struct State {
     divide_operation_button: button::State,
     reset_operation_button: button::State,
     calculate_operation_button: button::State,
+    number_buttons: [button::State; 10],
 }
 
 // 操作
@@ -55,6 +56,21 @@ impl Sandbox for State {
                 Operation::Add => {
                     println!("add");
                 }
+                Operation::Subtract => {
+                    println!("subtract");
+                }
+                Operation::Multiply => {
+                    println!("multiply");
+                }
+                Operation::Divide => {
+                    println!("divide");
+                }
+                Operation::Reset => {
+                    println!("reset");
+                }
+                Operation::Calculate => {
+                    println!("calculate");
+                }
                 _ => {
                     println!("other");
                 }
@@ -67,21 +83,39 @@ impl Sandbox for State {
         // add
         let add_button = Button::new(
             &mut self.add_operation_button,
-            Text::new("add").color(Color::from_rgb(100.0, 100.0, 0.0)),
+            Text::new("add").color(Color::from_rgb(0.0, 0.0, 0.0)),
         )
         .on_press(Message::ButtonPressed(Operation::Add));
         // subtract
         let subtract_button = Button::new(
             &mut self.subtract_operation_button,
-            Text::new("subtract").color(Color::from_rgb(100.0, 100.0, 0.0)),
+            Text::new("subtract").color(Color::from_rgb(0.0, 0.0, 0.0)),
         )
         .on_press(Message::ButtonPressed(Operation::Subtract));
-
+        // multiply
         let multiply_button = Button::new(
             &mut self.multiply_operation_button,
-            Text::new("multiply").color(Color::from_rgb(100.0, 100.0, 0.0)),
+            Text::new("multiply").color(Color::from_rgb(0.0, 0.0, 0.0)),
         )
         .on_press(Message::ButtonPressed(Operation::Multiply));
+        // divide
+        let divide_button = Button::new(
+            &mut self.divide_operation_button,
+            Text::new("divide").color(Color::from_rgb(0.0, 0.0, 0.0)),
+        )
+        .on_press(Message::ButtonPressed(Operation::Multiply));
+
+        // number_buttons
+        let number_buttons = vec![1, 2, 3, 4, 5, 6, 7, 8, 9]
+            .iter()
+            .map(|i| {
+                Button::new(
+                    &mut self.number_buttons[i as u32],
+                    Text::new(i.to_string()).color(Color::from_rgb(0.0, 0.0, 0.0)),
+                )
+                .on_press(Message::ButtonPressed(Operation::Reset))
+            })
+            .collect::<Vec<_>>();
 
         // カラム
         Column::new()
@@ -90,6 +124,7 @@ impl Sandbox for State {
             .push(add_button)
             .push(subtract_button)
             .push(multiply_button)
+            .push(divide_button)
             .into()
     }
 }
