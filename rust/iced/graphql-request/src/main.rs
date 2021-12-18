@@ -23,6 +23,7 @@ struct State {
 #[derive(Debug, Clone, Copy)]
 enum Message {
     RequestPressed,
+    RequestResult(Result<(), ()>),
 }
 
 impl Application for State {
@@ -41,37 +42,21 @@ impl Application for State {
     fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
         match message {
             Message::RequestPressed => {
-                let com = Command::perform(
-                    async {
-                        let client = reqwest::Client::new();
-                        let text = client
-                            .get("https://jsonplaceholder.typicode.com/todos/1")
-                            .send()
-                            .await
-                            .unwrap()
-                            .text()
-                            .await
-                            .unwrap()
-                            .to_string();
-                        text
-                    },
-                    |data| {
-                        println!("{:?}", data);
-                    },
-                );
-                // .futures();
-                // Command::batch(com);
+                // Command::perform(SampleRequest::sample_request(), |data| {
+                //     println!("{:?}", data);
+                // });
+                Command::perform(SampleRequest::sample_request(), Message::RequestResult)
 
-                let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
                 // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
-                // let result = reqwest::blocking::get("http://localhost:8000/graphql");
-                let result = match result {
-                    Ok(response) => response.text(),
-                    Err(e) => {
-                        panic!("{:?}", e);
-                    }
-                };
-                self.value = result.unwrap().to_string();
+                // // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
+                // // let result = reqwest::blocking::get("http://localhost:8000/graphql");
+                // let result = match result {
+                //     Ok(response) => response.text(),
+                //     Err(e) => {
+                //         panic!("{:?}", e);
+                //     }
+                // };
+                // self.value = result.unwrap().to_string();
             }
         }
         Command::none()
@@ -89,5 +74,27 @@ impl Application for State {
             .push(request_button);
 
         Scrollable::new(&mut self.scroll).push(content).into()
+    }
+}
+
+#[derive(Debug, Clone)]
+struct SampleRequest {
+    value: String,
+}
+
+impl SampleRequest {
+    async fn sample_request() -> String {
+        let client = reqwest::Client::new();
+        let text = client
+            .get("https://jsonplaceholder.typicode.com/todos/1")
+            .send()
+            .await
+            .unwrap()
+            .text()
+            .await
+            .unwrap()
+            .to_string();
+        println!("{:?}", text);
+        text
     }
 }
