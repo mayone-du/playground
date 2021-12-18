@@ -1,23 +1,33 @@
-use graphql_client::{GraphQLQuery, Response};
+// use graphql_client::{GraphQLQuery, Response};
 use iced::{
     button, executor, scrollable, Application, Button, Clipboard, Column, Command, Element,
     Scrollable, Settings, Text,
 };
-use iced_winit::{event, winit, winit::event_loop::EventLoop};
 use reqwest;
-use tokio;
 
 pub fn main() -> iced::Result {
-    // let event_loop = EventLoop::new();
-    // let window = winit::window::Window::new(&event_loop).unwrap();
     State::run(Settings::default())
+}
+
+#[derive(Debug)]
+enum RootState {
+    Loading,
+    Loaded(State),
+    Error,
+}
+
+#[derive(Default, Debug)]
+struct AppState {
+    scroll: scrollable::State,
+    value: String,
+    request_button: button::State,
 }
 
 #[derive(Default, Debug)]
 struct State {
-    scroll: scrollable::State,
-    value: String,
-    request_button: button::State,
+    name: String,
+    description: String,
+    age: i32,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -48,8 +58,6 @@ impl Application for State {
                 Command::perform(SampleRequest::sample_request(), Message::RequestResult)
 
                 // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
-                // // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
-                // // let result = reqwest::blocking::get("http://localhost:8000/graphql");
                 // let result = match result {
                 //     Ok(response) => response.text(),
                 //     Err(e) => {
@@ -58,6 +66,14 @@ impl Application for State {
                 // };
                 // self.value = result.unwrap().to_string();
             }
+            Message::RequestResult(result) => match result {
+                Ok(response) => {
+                    println!("{:?}", response);
+                }
+                Err(e) => {
+                    panic!("{:?}", e);
+                }
+            },
         }
         Command::none()
     }
