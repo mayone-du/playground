@@ -67,6 +67,8 @@ impl Application for GraphQLRequest {
             }
             Message::RequestResult(result) => match result {
                 Ok(response) => {
+                    let time = std::time::Duration::from_secs(3);
+                    std::thread::sleep(time);
                     *self = GraphQLRequest::Loaded {
                         response: Response { data: response },
                         button: button::State::new(),
