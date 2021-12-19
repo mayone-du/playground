@@ -1,4 +1,3 @@
-use iced::image::Viewer;
 use iced::Row;
 use iced::{
     button, executor, scrollable, Application, Button, Clipboard, Column, Command, Element,

@@ -18,7 +18,7 @@ struct State {
     divide_operation_button: button::State,
     reset_operation_button: button::State,
     calculate_operation_button: button::State,
-    number_buttons: [button::State; 10],
+    number_buttons: button::State,
 }
 
 // 操作
@@ -106,16 +106,16 @@ impl Sandbox for State {
         .on_press(Message::ButtonPressed(Operation::Multiply));
 
         // number_buttons
-        let number_buttons = vec![1, 2, 3, 4, 5, 6, 7, 8, 9]
-            .iter()
-            .map(|i| {
-                Button::new(
-                    &mut self.number_buttons[i as u32],
-                    Text::new(i.to_string()).color(Color::from_rgb(0.0, 0.0, 0.0)),
-                )
-                .on_press(Message::ButtonPressed(Operation::Reset))
-            })
-            .collect::<Vec<_>>();
+        // let number_buttons = vec![1, 2, 3, 4, 5, 6, 7, 8, 9]
+        //     .iter()
+        //     .map(|i| {
+        //         Button::new(
+        //             &mut self.number_buttons,
+        //             Text::new(i.to_string()).color(Color::from_rgb(0.0, 0.0, 0.0)),
+        //         )
+        //         .on_press(Message::ButtonPressed(Operation::Reset))
+        //     })
+        //     .collect::<Vec<_>>();
 
         // カラム
         Column::new()

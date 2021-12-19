@@ -1,76 +1,79 @@
 // use graphql_client::{GraphQLQuery, Response};
 use iced::{
-    button, executor, scrollable, Application, Button, Clipboard, Column, Command, Element,
-    Scrollable, Settings, Text,
+    button, executor, scrollable, Application, Button, Clipboard, Column, Command, Container,
+    Element, Scrollable, Settings, Text,
 };
 use reqwest;
 
 pub fn main() -> iced::Result {
-    State::run(Settings::default())
+    GraphQLRequest::run(Settings::default())
 }
 
 #[derive(Debug)]
-enum RootState {
+enum GraphQLRequest {
     Loading,
-    Loaded(State),
-    Error,
+    Loaded {
+        response: Response,
+        button: button::State,
+    },
+    Errored,
 }
 
-#[derive(Default, Debug)]
-struct AppState {
-    scroll: scrollable::State,
-    value: String,
-    request_button: button::State,
+#[derive(Debug)]
+struct Response {
+    data: String,
 }
 
-#[derive(Default, Debug)]
-struct State {
-    name: String,
-    description: String,
-    age: i32,
-}
+// #[derive(Default, Debug)]
+// struct State {
+//     scroll: scrollable::State,
+//     value: String,
+//     request_button: button::State,
+// }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 enum Message {
     RequestPressed,
-    RequestResult(Result<(), ()>),
+    RequestResult(Result<String, ()>),
 }
 
-impl Application for State {
+impl Application for GraphQLRequest {
     type Message = Message;
     type Executor = executor::Default;
     type Flags = ();
 
-    fn new(_flags: ()) -> (Self, Command<Message>) {
-        (Self::default(), Command::none())
+    fn new(_flags: ()) -> (GraphQLRequest, Command<Message>) {
+        (
+            GraphQLRequest::Loading,
+            // SampleRequest::sample_request()で受け取ったOk(String)をMessage::RequestResultにわたしてる？
+            Command::perform(SampleRequest::sample_request(), Message::RequestResult),
+            // Command::none(), // 起動時には何もしない
+        )
     }
 
     fn title(&self) -> String {
-        String::from("GraphQL Request - Iced")
+        let subtitle = match self {
+            GraphQLRequest::Loading => "Loading...",
+            GraphQLRequest::Loaded { .. } => "GraphQL Request",
+            GraphQLRequest::Errored => "Errored!",
+        };
+        format!("Iced - {}", subtitle)
     }
 
     fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> Command<Message> {
         match message {
             Message::RequestPressed => {
-                // Command::perform(SampleRequest::sample_request(), |data| {
-                //     println!("{:?}", data);
-                // });
-                Command::perform(SampleRequest::sample_request(), Message::RequestResult)
-
-                // let result = reqwest::blocking::get("https://jsonplaceholder.typicode.com/posts/");
-                // let result = match result {
-                //     Ok(response) => response.text(),
-                //     Err(e) => {
-                //         panic!("{:?}", e);
-                //     }
-                // };
-                // self.value = result.unwrap().to_string();
+                Command::perform(SampleRequest::sample_request(), Message::RequestResult);
             }
             Message::RequestResult(result) => match result {
                 Ok(response) => {
-                    println!("{:?}", response);
+                    *self = GraphQLRequest::Loaded {
+                        response: Response { data: response },
+                        button: button::State::new(),
+                    };
                 }
                 Err(e) => {
+                    *self = GraphQLRequest::Errored;
                     panic!("{:?}", e);
                 }
             },
@@ -79,17 +82,21 @@ impl Application for State {
     }
 
     fn view(&mut self) -> Element<Message> {
-        let text = Text::new(&self.value).size(10);
-        let request_button = Button::new(&mut self.request_button, Text::new("Request"))
-            .on_press(Message::RequestPressed);
-        let content = Column::new()
-            .padding(20)
-            .spacing(20)
-            .max_width(500)
-            .push(text)
-            .push(request_button);
+        let content = match self {
+            GraphQLRequest::Loading => Column::new().push(Text::new("Loading...")),
+            GraphQLRequest::Loaded { response, button } => {
+                Column::new()
+                    .padding(20)
+                    .push(Text::new(&response.data))
+                    .push(
+                        Button::new(button, Text::new("Request")).on_press(Message::RequestPressed),
+                    )
+                // Text::new(&response.data);
+            }
+            GraphQLRequest::Errored => Column::new().push(Text::new("Errored!")),
+        };
 
-        Scrollable::new(&mut self.scroll).push(content).into()
+        Column::new().padding(20).push(content).into()
     }
 }
 
@@ -99,7 +106,7 @@ struct SampleRequest {
 }
 
 impl SampleRequest {
-    async fn sample_request() -> String {
+    async fn sample_request() -> Result<String, ()> {
         let client = reqwest::Client::new();
         let text = client
             .get("https://jsonplaceholder.typicode.com/todos/1")
@@ -111,6 +118,6 @@ impl SampleRequest {
             .unwrap()
             .to_string();
         println!("{:?}", text);
-        text
+        Ok(text)
     }
 }
