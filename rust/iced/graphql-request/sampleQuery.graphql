@@ -1,0 +1,11 @@
+query Query($userId: BigInt) {
+  user(id: $userId) {
+    id
+    email
+    username
+    nickname
+    createdAt
+    updatedAt
+    role
+  }
+}

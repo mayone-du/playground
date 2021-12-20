@@ -67,8 +67,11 @@ impl Application for GraphQLRequest {
             }
             Message::RequestResult(result) => match result {
                 Ok(response) => {
+                    // ! Loadingが表示されるのを確認するために3秒待機3秒待機
                     let time = std::time::Duration::from_secs(3);
                     std::thread::sleep(time);
+
+                    // &mutなselfの参照を外して、Loadedに変更する
                     *self = GraphQLRequest::Loaded {
                         response: Response { data: response },
                         button: button::State::new(),
