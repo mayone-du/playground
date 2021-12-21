@@ -34,7 +34,7 @@ struct Response {
 #[derive(Debug, Clone)]
 enum Message {
     RequestPressed,
-    RequestResult(Result<String, ()>),
+    RequestResult(Result<String, AppError>),
 }
 
 impl Application for GraphQLRequest {
@@ -96,7 +96,6 @@ impl Application for GraphQLRequest {
                     .push(
                         Button::new(button, Text::new("Request")).on_press(Message::RequestPressed),
                     )
-                // Text::new(&response.data);
             }
             GraphQLRequest::Errored => Column::new().push(Text::new("Errored!")),
         };
@@ -111,10 +110,12 @@ struct SampleRequest {
 }
 
 impl SampleRequest {
-    async fn sample_request() -> Result<String, ()> {
+    async fn sample_request() -> Result<String, AppError> {
         let client = reqwest::Client::new();
+        let id = 1;
+        let url = format!("https://jsonplaceholder.typicode.com/todos/{}", id.to_string());
         let text = client
-            .get("https://jsonplaceholder.typicode.com/todos/1")
+            .get(url)
             .send()
             .await
             .unwrap()
@@ -122,7 +123,9 @@ impl SampleRequest {
             .await
             .unwrap()
             .to_string();
-        println!("{:?}", text);
         Ok(text)
     }
 }
+
+#[derive(Debug, Clone)]
+struct AppError {}
