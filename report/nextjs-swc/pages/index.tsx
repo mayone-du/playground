@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { Sample } from "../components/Sample";
-import { Status } from "../types";
+
+type Status = "loading" | "error" | "success";
 
 const IndexPage: NextPage = () => {
   const [value, setValue] = useState<Status>("loading");
@@ -10,7 +10,16 @@ const IndexPage: NextPage = () => {
       setValue("success");
     }, 1000);
   }, []);
-  return <Sample value={value} />;
+
+  if (value === "loading") {
+    return <div>loading...</div>;
+  } else if (value === "error") {
+    return <div>error</div>;
+  } else {
+    return <div>success🥰 unreachable code is not called🙆‍♂️</div>;
+  }
+
+  return <div>unreachable code!!! this is a bug🐛</div>;
 };
 
 export default IndexPage;
