@@ -1,26 +1,16 @@
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
-
-type Status = "success" | "error" | "loading";
+import { Sample } from "../components/Sample";
+import { Status } from "../types";
 
 const IndexPage: NextPage = () => {
-  const [state, setState] = useState<Status>("loading");
-
+  const [value, setValue] = useState<Status>("loading");
   useEffect(() => {
     setTimeout(() => {
-      setState("success");
-    }, 3000);
+      setValue("success");
+    }, 1000);
   }, []);
-
-  if (state === "loading") {
-    return <div>Loading...</div>;
-  } else if (state === "error") {
-    return <div>Error!!</div>;
-  } else {
-    return <div>Success!!!</div>;
-  }
-
-  return <div>unreachable!!!</div>;
+  return <Sample value={value} />;
 };
 
 export default IndexPage;
