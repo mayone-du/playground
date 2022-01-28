@@ -1,0 +1,29 @@
+:root {
+  --square-root: 4;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+#panel {
+  display: grid;
+  grid-template-columns: repeat(var(--square-root), 50px);
+}
+
+.tile {
+  display: block;
+  column-span: 1;
+  line-height: 50px;
+  border: 1px solid silver;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+  box-shadow: gray 2px 2px;
+  cursor: pointer;
+}
