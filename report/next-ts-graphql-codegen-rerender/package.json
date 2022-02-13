@@ -1,0 +1,33 @@
+{
+  "name": "nextjs-template",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "jest --env=jsdom --verbose",
+    "generate": "graphql-codegen --config src/graphql/schemas/codegen.json",
+    "postbuild": "next-sitemap"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.4.16",
+    "dayjs": "^1.10.7",
+    "graphql": "^15.6.1",
+    "next": "^12.0.10",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^2.4.0",
+    "@graphql-codegen/typescript": "^2.4.2",
+    "@graphql-codegen/typescript-operations": "^2.2.2",
+    "@graphql-codegen/typescript-react-apollo": "^3.2.4",
+    "@types/node": "^17.0.17",
+    "@types/react": "^17.0.39",
+    "eslint": "^7.32.0",
+    "postcss": "^8.4.6",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.5"
+  }
+}
