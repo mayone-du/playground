@@ -1,0 +1,25 @@
+# DateTime型（わんちゃんカスタムスカラー型？）を引数にとるとエラーになる
+query Test($customArg: DateTime!) {
+  test(customArg: $customArg)
+}
+
+# query Test($customArg: String!) {
+#   test(customArg: $customArg)
+# }
+
+# 以下Prisma
+# import { extendType } from "nexus";
+
+# export const testQuery = extendType({
+#   type: "Query",
+#   definition(t) {
+#     t.field("test", {
+#       type: "String",
+#       args: { customArg: "DateTime" }, # This is Error!
+#       # args: { customArg: "String" }, // Not Error.
+#       resolve: async (_root, args, _ctx, _info) => {
+#         return await `args is ${args.customArg}`;
+#       },
+#     });
+#   },
+# });
