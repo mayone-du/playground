@@ -14,7 +14,7 @@ paginate: true
 
 - いわゆる BaaS（Backend as a Service）と呼ばれるもの
 - Firebase の RDB 版
-- オープンソース、セルフホスティングも可能
+- オープンソース、セルフホスティング可
 - Web, App 対応
 
 ---
@@ -25,7 +25,6 @@ paginate: true
 - Authentication
 - Storage
 - Realtime
-- Logging
 - Edge Funcitons （Beta ~ 2022/08/01）
 - GraphQL
 
@@ -41,8 +40,9 @@ etc...
 
 ## :one: Supabase プロジェクトの初期化
 
-- https://supabase.com から GitHub ログインして、プロジェクト名やパスワード、リージョン等を設定
-- 設定後、https://app.supabase.com/project/<projectId> から、API エンドポイントと anon key をコピー
+- https://supabase.com から GitHub ログイン
+- プロジェクト名やパスワード、リージョン等を設定
+  - 東京リージョン :o:
 
 <!-- LT用 https://app.supabase.com/project/nlemkqykrspauaasknga -->
 
@@ -50,9 +50,10 @@ etc...
 
 ### テーブル作成
 
-- SQL Editor か、Table Editor 上でテーブルを定義
-- auth.users テーブルがデフォルトで定義されており、これは変更不可
-- public スキーマ上に定義する
+- SQL Editor か、Table Editor でテーブルを定義
+  - UI の実装がまだ追いついていない
+  - 細かい設定をしたい場合は SQL を書く必要がある
+- Supabase で認証を行うと、auth.users テーブルにデータがたまってく
 
 ![bg right:45%](table-editor-1.png)
 
@@ -97,8 +98,8 @@ const { user, session, error } = await supabase.auth.signIn({
 });
 ```
 
-- SMS 認証、email による招待なども可能
-- プロバイダーも豊富
+- SMS 認証
+- ソーシャルログイン
   - Apple, Discord, Facebook, GitHub, Google, Notion, Twitter...
 
 ---
@@ -122,16 +123,18 @@ const { data, error } = await supabase.from<Task>("tasks").select("*");
 
 ### Realtime
 
-- DB 側でデータに変更があった場合に、WebSocket を用いてクライアント側へデータを送信することができる
+- DB に変更があった時に、WebSocket を用いてクライアント側へデータを送信することができる
 - ダッシュボードから、有効化したいテーブルを選ぶことで使用可能
 
 ```TypeScript
-const tasks = supabase
+const tasksListener = supabase
   .from('tasks')
   .on('*', payload => { // INSERT | DELETE...
     console.log('Change received!', payload)
   })
-  .subscribe()
+  .subscribe();
+
+// tasksListener.unsubscribe();
 ```
 
 ---
@@ -172,13 +175,13 @@ const { data, error } = await supabase
 CREATE POLICY "policy_name"
 ON public.tasks
 FOR SELECT USING ( -- 既存レコードには USING、新規レコードには WITH CHECK
-  auth.uid() = user_id
+  auth.uid() = user_id -- 条件式
 );
 ```
 
-↑ tasks テーブルを Read したときに、リクエストを行ったユーザー ID と tasks.user_id が一致するレコードしか返さない
+↑ tasks テーブルを取得したときに、リクエストを行ったユーザー ID と tasks.user_id が一致する場合のみ OK
 
-**細かい認証ルールが必要な場合には、基本的にこの RLS のポリシーで設定する**
+**細かいアクセス制限が必要な場合には、基本的にこの RLS のポリシーで設定する**
 
 <!-- _footer: クライアント側で自由に DB へアクセスされるのを防ぐためにも、基本的に RLS の有効化は必須-->
 
@@ -195,7 +198,7 @@ FOR SELECT USING ( -- 既存レコードには USING、新規レコードには 
 ## :seven: GraphQL
 
 - Supabase で GraphQL も利用可能に :tada:
-- ダッシュボード で少しポチポチして、SQL を実行するだけですぐ使える
+- 有効化するにはダッシュボードでボタンおすだけ
 - 自動で各テーブルの Query, Mutation を生成
 
 ```SQL
@@ -216,8 +219,8 @@ select graphql.rebuild_schema(); -- GraphQLスキーマを再生成
 
 - `Database Functions`や`Triggers`
   - トランザクション
-  - `Database Funciton`はクライアント側から呼び出すことも可能（`supabase.rpc("関数名")`）
   - 特定のデータの変更を感知して処理を実行
+  - `Database Funcitons`はクライアント側から呼び出すことも可能（`supabase.rpc("関数名")`）
 - `Edge Functios`
   - Deno ランタイム上で JS,TS を実行できる
 
@@ -234,9 +237,7 @@ DB をいじりたい場合 → `Database Functions`
 - `supabase-cli`
   - Docker を使ったローカル開発
   - マイグレーション
-- 全文検索も可能
-- 匿名ログインができない
-  - → Email 認証の設定で、メールを確認してなくても登録可にすることでそれっぽくはできる
+  - `Edge Functions`の作成、デプロイ
 
 ---
 
@@ -248,18 +249,24 @@ DB をいじりたい場合 → `Database Functions`
 
 - 手早くバックエンド作れて幸せ
 - API も直感的でわかりやすく、GraphQL も使える
-- 個人、小規模のプロダクトなら全然 Supabase で良さそう
 - 主要な機能は大体揃ってるし、PostgreSQL の機能を使えるため、結構色々できる
-- Twitter で「Supabase」っていれてつぶやくと、中の人がたまに反応してくれる（質問答えてくれた）
+- Twitter で「Supabase」についてつぶやくと、中の人がたまに反応してくれる（質問答えてくれた）
 
 ---
 
 # :weary:
 
-- ダッシュボードからボタンぽちぽちするだけで完結するのは厳しい。SQL の知識 は必要
-  - テーブル定義、RLS など
+- SQL の学習コスト
+  - テーブル定義、RLS、Database Functions など
 - すべての機能が Production Ready なわけではないので注意
 - Web Push がない
+
+---
+
+**全体的に好印象**
+
+- 個人、小規模のプロダクト
+- SQL の学習コスト < バックエンド 1 から作る or 別サービス
 
 ---
 
