@@ -33,7 +33,7 @@ etc...
 
 ---
 
-# サンプルコード（Web）を交えた各機能の解説
+# サンプルコード（Web）や各機能について
 
 <!-- _footer: Flutter https://supabase.com/docs/guides/with-flutter -->
 
@@ -41,7 +41,7 @@ etc...
 
 ## :one: Supabase プロジェクトの初期化
 
-- https://supabase.com から GitHub ログインして、プロジェクト名やパスワード、リージョン等を設定。
+- https://supabase.com から GitHub ログインして、プロジェクト名やパスワード、リージョン等を設定
 - 設定後、https://app.supabase.com/project/<projectId> から、API エンドポイントと anon key をコピー
 
 <!-- LT用 https://app.supabase.com/project/nlemkqykrspauaasknga -->
@@ -52,7 +52,6 @@ etc...
 
 - SQL Editor か、Table Editor 上でテーブルを定義
 - auth.users テーブルがデフォルトで定義されており、これは変更不可
-  - 直接読み取ることもできないので、少し工夫が必要になる
 - public スキーマ上に定義する
 
 ![bg right:45%](table-editor-1.png)
@@ -76,6 +75,11 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 ```
 
+- anon
+  - クライアントへ渡して OK
+- service_role
+  - サーバー側でしかだめ。RLS の設定を無視できる管理者用のキー
+
 ---
 
 ## :three: 認証
@@ -95,7 +99,7 @@ const { user, session, error } = await supabase.auth.signIn({
 
 - SMS 認証、email による招待なども可能
 - プロバイダーも豊富
-  - Apple,Discord,Facebook,GitHub,Google,Notion,Twitter...
+  - Apple, Discord, Facebook, GitHub, Google, Notion, Twitter...
 
 ---
 
@@ -104,9 +108,10 @@ const { user, session, error } = await supabase.auth.signIn({
 すべての tasks テーブルのデータを取得
 
 ```TypeScript
-type Task = { id: string, ... }
-const { data, error } = await supabase.from<Task>("tasks").select("*")
+type Task = { id: string, title: string, ... };
+const { data, error } = await supabase.from<Task>("tasks").select("*");
 // .eq({ user_id: "hoge" })
+// res -> Task[]
 ```
 
 コメント部分のようにフィルターも可能だが、後述する RLS とどちらを使用するかは要検討
@@ -118,7 +123,7 @@ const { data, error } = await supabase.from<Task>("tasks").select("*")
 ### Realtime
 
 - DB 側でデータに変更があった場合に、WebSocket を用いてクライアント側へデータを送信することができる
-- ダッシュボードから、適用したいテーブルの設定をオンにすることで使用可能
+- ダッシュボードから、有効化したいテーブルを選ぶことで使用可能
 
 ```TypeScript
 const tasks = supabase
@@ -156,7 +161,7 @@ const { data, error } = await supabase
 - PostgreSQL の機能で、ポリシーを指定することで行単位でのセキュリティの設定が可能
 - ポリシー
   - 「各ポリシーはテーブルに関連付けられ、テーブルにアクセスするたびにポリシーが実行される。すべてのクエリに WHERE 句を追加するようなもの」とのこと
-- Supabase 側で、ポリシーで使用できる便利関数がいくつか用意されている。
+- Supabase 側で、ポリシーで使用できる[便利関数](https://supabase.com/docs/guides/auth/row-level-security#helper-functions)がいくつか用意されている
   - `auth.uid()` -> リクエストを行ったユーザーの ID を返す、など
 
 ---
@@ -166,7 +171,7 @@ const { data, error } = await supabase
 ```SQL
 CREATE POLICY "policy_name"
 ON public.tasks
-FOR SELECT USING (
+FOR SELECT USING ( -- 既存レコードには USING、新規レコードには WITH CHECK
   auth.uid() = user_id
 );
 ```
@@ -175,15 +180,15 @@ FOR SELECT USING (
 
 **細かい認証ルールが必要な場合には、基本的にこの RLS のポリシーで設定する**
 
-<!-- _footer: クライアント側で自由に DB へアクセスされるのを防ぐためにも、基本的に RLS の設定は必須-->
+<!-- _footer: クライアント側で自由に DB へアクセスされるのを防ぐためにも、基本的に RLS の有効化は必須-->
 
----
-
+<!-- ---
 - Database Functions
   - SQL で定義
   - supabase.rpc("関数名")
+  - triggerを作成して、〇〇テーブルへのinsertをトリガーに関数実行、みたいなことができる
 - Edge Functions
-  - Deno ランタイム上で JS / TS を実行可能
+  - Deno ランタイム上で JS / TS を実行可能 -->
 
 ---
 
@@ -195,10 +200,11 @@ FOR SELECT USING (
 
 ```SQL
 comment on schema public is e'@graphql({"inflect_names": true})';
+-- snake_case → PascalCase
 ```
 
 ```SQL
-select graphql.rebuild_schema();
+select graphql.rebuild_schema(); -- GraphQLスキーマを再生成
 ```
 
 <!-- https://nlemkqykrspauaasknga.supabase.co/graphql/v1 -->
@@ -206,21 +212,31 @@ select graphql.rebuild_schema();
 
 ---
 
-## その他
+## その他 :one:
 
-- トランザクションや、特定のデータの変更を感知して処理を実行したい場合などは、`Database Functions`や`Triggers`を使えばできそう
-<!-- 参考:
-- https://zenn.dev/hrtk/articles/supabase-nextjs-database-function-table
-- https://zenn.dev/matken/articles/use-user-info-with-supabase
+- `Database Functions`や`Triggers`
+  - トランザクション
+  - `Database Funciton`はクライアント側から実行することも可能（`supabase.rpc("関数名")`）
+  - 特定のデータの変更を感知して処理を実行
+- `Edge Functios`
+  - Deno ランタイム上で JS,TS を実行できる
+
+DB をいじりたい場合 → `Database Functions`
+低レイテンシーを必要とする場合 → `Edge Functions`
+
+  <!-- 参考: - https://zenn.dev/hrtk/articles/supabase-nextjs-database-function-table - https://zenn.dev/matken/articles/use-user-info-with-supabase
   -->
 
+---
+
+## その他 :two:
+
+- `supabase-cli`
+  - Docker を使ったローカル開発
+  - マイグレーション
 - 全文検索も可能
 - 匿名ログインができない
-  - → Email 認証の設定で、メールを確認してなくても登録可にすることでそれっぽくはできる。
-- `supabase-cli`
-  - マイグレーション
-  - Docker を使ったローカル開発
-  <!-- - `Edge Functios` は Deno ランタイム上で JS,TS を実行できる（ユースケースがまだあんまわかってない） -->
+  - → Email 認証の設定で、メールを確認してなくても登録可にすることでそれっぽくはできる
 
 ---
 
@@ -234,15 +250,16 @@ select graphql.rebuild_schema();
   - Next.js on Vercel + Supabase、やべぇ
 - API も直感的でわかりやすく、GraphQL も使える
 - 個人、小規模のプロダクトなら全然 Supabase で良さそう
+- 主要な機能は揃ってるし、PostgreSQL の機能を使えるため、結構色々できる
 - Twitter で「Supabase」っていれてつぶやくと、中の人がたまに反応してくれる（質問答えてくれた）
 
 ---
 
 # :weary:
 
-- ダッシュボードからボタンぽちぽちするだけで完結するのは厳しそう。SQL の知識は必要だと感じた
-  - Enum、RLS、Delete Cascade など
-- すべての機能が Production Ready なわけではないので、注意は必要
+- ダッシュボードからボタンぽちぽちするだけで完結するのは厳しい。SQL の知識 は必要
+  - テーブル定義、RLS など
+- すべての機能が Production Ready なわけではないので注意
 - Web Push がない
 
 ---
