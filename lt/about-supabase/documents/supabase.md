@@ -78,7 +78,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 - anon
   - クライアントへ渡して OK
 - service_role
-  - サーバー側でしかだめ。RLS の設定を無視できる管理者用のキー
+  - サーバー側でしか使用してはいけない。RLS の設定を無視できる管理者用のキー
 
 ---
 
@@ -111,7 +111,7 @@ const { user, session, error } = await supabase.auth.signIn({
 type Task = { id: string, title: string, ... };
 const { data, error } = await supabase.from<Task>("tasks").select("*");
 // .eq({ user_id: "hoge" })
-// res -> Task[]
+// data: Task[]
 ```
 
 コメント部分のようにフィルターも可能だが、後述する RLS とどちらを使用するかは要検討
@@ -192,7 +192,7 @@ FOR SELECT USING ( -- 既存レコードには USING、新規レコードには 
 
 ---
 
-## おまけ（GraphQL）
+## :seven: GraphQL
 
 - Supabase で GraphQL も利用可能に :tada:
 - ダッシュボード で少しポチポチして、SQL を実行するだけですぐ使える
@@ -216,7 +216,7 @@ select graphql.rebuild_schema(); -- GraphQLスキーマを再生成
 
 - `Database Functions`や`Triggers`
   - トランザクション
-  - `Database Funciton`はクライアント側から実行することも可能（`supabase.rpc("関数名")`）
+  - `Database Funciton`はクライアント側から呼び出すことも可能（`supabase.rpc("関数名")`）
   - 特定のデータの変更を感知して処理を実行
 - `Edge Functios`
   - Deno ランタイム上で JS,TS を実行できる
@@ -246,11 +246,10 @@ DB をいじりたい場合 → `Database Functions`
 
 # :smile:
 
-- 爆速でバックエンド作れて幸せ
-  - Next.js on Vercel + Supabase、やべぇ
+- 手早くバックエンド作れて幸せ
 - API も直感的でわかりやすく、GraphQL も使える
 - 個人、小規模のプロダクトなら全然 Supabase で良さそう
-- 主要な機能は揃ってるし、PostgreSQL の機能を使えるため、結構色々できる
+- 主要な機能は大体揃ってるし、PostgreSQL の機能を使えるため、結構色々できる
 - Twitter で「Supabase」っていれてつぶやくと、中の人がたまに反応してくれる（質問答えてくれた）
 
 ---
@@ -264,4 +263,4 @@ DB をいじりたい場合 → `Database Functions`
 
 ---
 
-# ご清聴ありがとうございました
+# ご清聴ありがとうございました :wave:
