@@ -53,7 +53,6 @@ etc...
 - SQL Editor か、Table Editor でテーブルを定義
   - UI の実装がまだ追いついていない
   - 細かい設定をしたい場合は SQL を書く必要がある
-- Supabase で認証を行うと、auth.users テーブルにデータがたまってく
 
 ![bg right:45%](table-editor-1.png)
 
@@ -88,34 +87,34 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 ```TypeScript
 import { supabase } from "どっか"; // 2で初期化したインスタンスをimport
 
-// ユーザー情報を取得
-const user = supabase.auth.user();
+const user = supabase.auth.user(); // ユーザー情報を取得
 
-// ログイン
 const { user, session, error } = await supabase.auth.signIn({
   email: 'example@email.com',
   password: 'example-password',
 });
 ```
 
+- auth.users テーブルにデータがたまってく
 - SMS 認証
 - ソーシャルログイン
   - Apple, Discord, Facebook, GitHub, Google, Notion, Twitter...
 
 ---
 
-## :four: データ取得
-
-すべての tasks テーブルのデータを取得
+## :four: CRUD
 
 ```TypeScript
 type Task = { id: string, title: string, ... };
-const { data, error } = await supabase.from<Task>("tasks").select("*");
-// .eq({ user_id: "hoge" })
-// data: Task[]
+const { data, error } = await supabase
+  .from<Task>("tasks")
+  // .select("*");
+  // .insert([{ title: 'foo' }], { upsert: true })
+  // .update({ title: 'hoge' })
+  // .delete()
 ```
 
-コメント部分のようにフィルターも可能だが、後述する RLS とどちらを使用するかは要検討
+各テーブルの API のドキュメントが自動で生成
 
 <!-- _footer: SDK側でキャッシュはしてないので注意 -->
 
@@ -139,32 +138,11 @@ const tasksListener = supabase
 
 ---
 
-## :five: 作成、更新、削除
+## :five: RLS（Row Level Security）
 
-```TypeScript
-const { data, error } = await supabase
-  .from('tasks')
-  .insert([{ title: 'foo' }], { upsert: true })
-
-const { data, error } = await supabase
-  .from('tasks')
-  .update({ title: 'hoge' })
-  .eq('id', 'taskId')
-
-const { data, error } = await supabase
-  .from('tasks')
-  .delete()
-  .eq('id', 'taskId')
-```
-
----
-
-## :six: RLS（Row Level Security）
-
-- PostgreSQL の機能で、ポリシーを指定することで行単位でのセキュリティの設定が可能
-- ポリシー
-  - 「各ポリシーはテーブルに関連付けられ、テーブルにアクセスするたびにポリシーが実行される。すべてのクエリに WHERE 句を追加するようなもの」とのこと
-- Supabase 側で、ポリシーで使用できる[便利関数](https://supabase.com/docs/guides/auth/row-level-security#helper-functions)がいくつか用意されている
+- PostgreSQL の機能
+  - ポリシーを指定することで行単位でのセキュリティの設定が可能
+- Supabase 側で[便利関数](https://supabase.com/docs/guides/auth/row-level-security#helper-functions)がいくつか用意されている
   - `auth.uid()` -> リクエストを行ったユーザーの ID を返す、など
 
 ---
@@ -195,10 +173,12 @@ FOR SELECT USING ( -- 既存レコードには USING、新規レコードには 
 
 ---
 
-## :seven: GraphQL
+## :six: GraphQL
 
 - Supabase で GraphQL も利用可能に :tada:
 - 有効化するにはダッシュボードでボタンおすだけ
+  - `/graphql/v1`
+  - `apiKey: anon key`
 - 自動で各テーブルの Query, Mutation を生成
 
 ```SQL
@@ -248,8 +228,9 @@ DB をいじりたい場合 → `Database Functions`
 # :smile:
 
 - 手早くバックエンド作れて幸せ
+- 主要な機能は大体そろってる
+  - PostgreSQL の機能を使えるため、細かいことも結構色々できそう
 - API も直感的でわかりやすく、GraphQL も使える
-- 主要な機能は大体揃ってるし、PostgreSQL の機能を使えるため、結構色々できる
 - Twitter で「Supabase」についてつぶやくと、中の人がたまに反応してくれる（質問答えてくれた）
 
 ---
@@ -263,10 +244,10 @@ DB をいじりたい場合 → `Database Functions`
 
 ---
 
-**全体的に好印象**
+### 全体的に好印象
 
 - 個人、小規模のプロダクト
-- SQL の学習コスト < バックエンド 1 から作る or 別サービス
+- SQL の学習コスト < バックエンドを 1 から作るコスト
 
 ---
 
