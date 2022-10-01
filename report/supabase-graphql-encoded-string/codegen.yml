@@ -1,0 +1,15 @@
+schema: schema.graphql
+documents: ./graphql/operations/**/*.gql
+generates:
+  ./graphql/generated/schema.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      namingConvention:
+        transformUnderscore: true
+      scalars:
+        BigInt: bigint
+        UUID: string
+        Datetime: Date

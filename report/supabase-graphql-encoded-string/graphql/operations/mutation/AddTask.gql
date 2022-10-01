@@ -1,0 +1,8 @@
+mutation AddTask($object: TasksInsertInput!) {
+  insertIntoTasksCollection(objects: [$object]) {
+    records {
+      id
+      title
+    }
+  }
+}
