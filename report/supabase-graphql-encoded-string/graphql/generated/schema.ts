@@ -262,6 +262,11 @@ export type AddTaskMutationVariables = Exact<{
 
 export type AddTaskMutation = { __typename?: 'Mutation', insertIntoTasksCollection?: { __typename?: 'TasksInsertResponse', records: Array<{ __typename?: 'Tasks', id: string, title: string }> } | null };
 
+export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TasksQuery = { __typename?: 'Query', tasksCollection?: { __typename?: 'TasksConnection', edges: Array<{ __typename?: 'TasksEdge', node: { __typename?: 'Tasks', id: string, title: string } }> } | null };
+
 
 export const AddTaskDocument = gql`
     mutation AddTask($object: TasksInsertInput!) {
@@ -299,3 +304,42 @@ export function useAddTaskMutation(baseOptions?: Apollo.MutationHookOptions<AddT
 export type AddTaskMutationHookResult = ReturnType<typeof useAddTaskMutation>;
 export type AddTaskMutationResult = Apollo.MutationResult<AddTaskMutation>;
 export type AddTaskMutationOptions = Apollo.BaseMutationOptions<AddTaskMutation, AddTaskMutationVariables>;
+export const TasksDocument = gql`
+    query Tasks {
+  tasksCollection(first: 100) {
+    edges {
+      node {
+        id
+        title
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTasksQuery__
+ *
+ * To run a query within a React component, call `useTasksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTasksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTasksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useTasksQuery(baseOptions?: Apollo.QueryHookOptions<TasksQuery, TasksQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TasksQuery, TasksQueryVariables>(TasksDocument, options);
+      }
+export function useTasksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TasksQuery, TasksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TasksQuery, TasksQueryVariables>(TasksDocument, options);
+        }
+export type TasksQueryHookResult = ReturnType<typeof useTasksQuery>;
+export type TasksLazyQueryHookResult = ReturnType<typeof useTasksLazyQuery>;
+export type TasksQueryResult = Apollo.QueryResult<TasksQuery, TasksQueryVariables>;

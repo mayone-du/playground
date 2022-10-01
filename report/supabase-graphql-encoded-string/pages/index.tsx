@@ -1,25 +1,24 @@
 import { NextPage } from "next";
-import { useState } from "react";
+import { Form } from "../components/Form";
+import { useTasksQuery } from "../graphql/generated/schema";
 
 const IndexPage: NextPage = () => {
-  const [sdkInput, setSdkInput] = useState("");
-  const [graphqlInput, setGraphqlInput] = useState("");
-
-  const handleSDKSubmit = async () => {};
-  const handleGraphQLSubmit = async () => {};
-
+  const { data, refetch } = useTasksQuery();
   return (
     <div>
-      <form>
-        <input
-          style={{
-            display: "block",
-            border: "1px solid lightgray",
-            padding: "4px",
-          }}
-        />
-        <button style={{ display: "block" }}>submit</button>
-      </form>
+      <ul>
+        {data?.tasksCollection?.edges.map(({ node }) => {
+          return (
+            <li key={node.id}>
+              {node.id}:{node.title}
+            </li>
+          );
+        })}
+      </ul>
+      <div style={{ display: "flex", gap: "30px" }}>
+        <Form type="sdk" refetch={refetch} />
+        <Form type="graphql" refetch={refetch} />
+      </div>
     </div>
   );
 };
