@@ -8,11 +8,7 @@ const IndexPage: NextPage = () => {
     <div>
       <ul>
         {data?.tasksCollection?.edges.map(({ node }) => {
-          return (
-            <li key={node.id}>
-              {node.id}:{node.title}
-            </li>
-          );
+          return <li key={node.id}>{node.title}</li>;
         })}
       </ul>
       <div style={{ display: "flex", gap: "30px" }}>

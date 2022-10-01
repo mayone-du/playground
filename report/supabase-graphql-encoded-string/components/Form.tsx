@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { TasksDocument, useAddTaskMutation } from "../graphql/generated/schema";
+import { useAddTaskMutation } from "../graphql/generated/schema";
 import { supabase } from "../utils/supabaseClient";
 
 type Props = {
@@ -13,6 +13,7 @@ export const Form: FC<Props> = ({ type, refetch }) => {
   const [addTask] = useAddTaskMutation();
 
   const handleSubmit = async () => {
+    if (!val) return;
     try {
       if (type === "sdk") {
         const { error } = await supabase.from("tasks").insert([{ title: val }]);
@@ -22,6 +23,7 @@ export const Form: FC<Props> = ({ type, refetch }) => {
       }
       refetch();
       setVal("");
+      setErr(null);
     } catch (e) {
       if (!(e instanceof Error)) return;
       setErr(JSON.stringify(e));
@@ -30,7 +32,8 @@ export const Form: FC<Props> = ({ type, refetch }) => {
 
   return (
     <div>
-      <input onChange={(e) => setVal(e.target.value)} />
+      <div style={{ fontWeight: "bold" }}>{type}</div>
+      <input onChange={(e) => setVal(e.target.value)} value={val} />
       <button onClick={handleSubmit}>Submit</button>
       {err && <div style={{ color: "red" }}>{err}</div>}
     </div>
