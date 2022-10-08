@@ -199,7 +199,7 @@ select graphql.rebuild_schema(); -- GraphQLスキーマを再生成
 
 - `Database Functions`や`Triggers`
   - トランザクション
-  - 特定のデータの変更を感知して処理を実行
+  - 特定のデータの変更を検知して処理を実行
   - `Database Funcitons`はクライアント側から呼び出すことも可能（`supabase.rpc("関数名")`）
 - `Edge Functios`
   - Deno ランタイム上で JS,TS を実行できる
@@ -218,6 +218,7 @@ DB をいじりたい場合 → `Database Functions`
   - Docker を使ったローカル開発
   - マイグレーション
   - `Edge Functions`の作成、デプロイ
+  - v2からはTypeScriptに対応し、型の自動生成が可能（SDKの補完が効く）
 
 ---
 
@@ -239,6 +240,7 @@ DB をいじりたい場合 → `Database Functions`
 
 - SQL の学習コスト
   - テーブル定義、RLS、Database Functions など
+- スケールしたとき大丈夫？
 - すべての機能が Production Ready なわけではないので注意
 - Web Push がない
 
@@ -246,8 +248,8 @@ DB をいじりたい場合 → `Database Functions`
 
 ### 全体的によさげ
 
-- 個人、小規模のプロダクトが向いてそう
-- 今後の進化にも期待 :muscle::man::muscle:
+- 個人、小規模のプロダクトは向いてそう
+- どんどん伸びているサービスなので、今後の進化にも期待 :muscle::man::muscle:
 
 ---
 
