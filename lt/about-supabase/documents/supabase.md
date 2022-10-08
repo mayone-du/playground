@@ -241,6 +241,7 @@ DB をいじりたい場合 → `Database Functions`
 - SQL の学習コスト
   - テーブル定義、RLS、Database Functions など
 - スケールしたとき大丈夫？
+- 複雑なロジック絡むときとかバリデーションは辛いかも
 - すべての機能が Production Ready なわけではないので注意
 - Web Push がない
 
